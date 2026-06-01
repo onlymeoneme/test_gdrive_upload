@@ -3,39 +3,45 @@ import json
 import mimetypes
 from io import BytesIO
 import requests  # pip install requests
-from google.oauth2 import service_account
+from google.oauth2.credentials import Credentials  # Новый импорт для пользовательских токенов
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 
 def sync_raw_urls_to_drive():
-    # 1. Загружаем секретный JSON из переменных окружения
+    # 1. Загружаем секретный JSON из переменных окружения GitHub
     creds_raw = os.environ.get("GDRIVE_CREDENTIALS")
     if not creds_raw:
         print("Ошибка: Переменная окружения GDRIVE_CREDENTIALS не найдена.")
         return
 
     try:
-        creds_json = json.loads(creds_raw)
+        creds_data = json.loads(creds_raw)
     except json.JSONDecodeError as e:
         print(f"Ошибка парсинга JSON: {e}")
         return
 
-    # 2. Список ваших прямых ссылок на raw-файлы
-    # Вы можете вставить их прямо сюда или считывать из файла/переменной окружения
+    # 2. Список ваших прямых ссылок на raw-файлы (замените на ваши реальные ссылки)
     URLS = [
-        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_1.txt",
-        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_2.txt",
-        # Добавьте сюда остальные ваши ссылки
+        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/sub_1.txt",
+        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/sub_2.txt",
     ]
 
-    # 3. Авторизуемся в Google API
-    SCOPES = ['https://www.googleapis.com/auth/drive']
-    creds = service_account.Credentials.from_service_account_info(creds_json, scopes=SCOPES)
+    # 3. Авторизуемся в Google API от имени вашего пользователя
+    creds = Credentials(
+        token=None,
+        refresh_token=creds_data["refresh_token"],
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=creds_data["client_id"],
+        client_secret=creds_data["client_secret"],
+        scopes=['https://www.googleapis.com/auth/drive']
+    )
+    
     drive_service = build('drive', 'v3', credentials=creds)
 
-    FOLDER_ID = "1RbHcpoEWUSs8T5QBGSqpOeYjJWJ7_g1h"  # Замените на реальный ID папки в Google Drive
+    # Точный ID вашей папки на Google Диске
+    FOLDER_ID = "1RbHcpoEWUSs8T5QBGSqpOeYjJWJ7_g1h"  
 
-    # 4. Получаем список файлов из Google Drive, чтобы знать, что обновлять, а что создавать
+    # 4. Получаем список существующих файлов на Диске
     print("Запрос списка существующих файлов с Google Drive...")
     query = f"'{FOLDER_ID}' in parents and trashed = false"
     try:
@@ -45,52 +51,42 @@ def sync_raw_urls_to_drive():
         print(f"Не удалось получить список файлов с Google Drive: {e}")
         return
 
-    # 5. Цикл по прямым ссылкам
+    # 5. Синхронизируем файлы по ссылкам
     for url in URLS:
-        # Извлекаем имя файла из конца URL (например, из ".../file1.txt" получим "file1.txt")
         filename = url.split("/")[-1]
-        
-        # Очищаем имя от возможных GET-параметров (например, токенов приватных репозиториев ?token=...)
         if "?" in filename:
             filename = filename.split("?")[0]
 
         print(f"\nСкачивание файла: {filename}...")
         
         try:
-            # Скачиваем файл в оперативную память
             file_response = requests.get(url)
             if file_response.status_code != 200:
                 print(f"-> Ошибка скачивания {filename}: Статус {file_response.status_code}")
                 continue
-            
             file_data = file_response.content
         except Exception as e:
             print(f"-> Не удалось подключиться к URL {url}: {e}")
             continue
 
-        # Определяем MIME-тип
         mime_type, _ = mimetypes.guess_type(filename)
         if not mime_type:
             mime_type = 'application/octet-stream'
 
-        # Оборачиваем байты из памяти в поток для отправки в Google API
         fh = BytesIO(file_data)
         media = MediaIoBaseUpload(fh, mimetype=mime_type, resumable=True)
 
         try:
             if filename in drive_files_dict:
-                # Если файл с таким именем уже есть на Диске -> Обновляем
+                # Если файл уже есть -> Обновляем (перезаписываем)
                 file_id = drive_files_dict[filename]
                 print(f"-> Файл найден на Диске (ID: {file_id}). Перезаписываем...")
                 drive_service.files().update(fileId=file_id, media_body=media).execute()
                 print("-> Успешно обновлено.")
             else:
-                # Если файла нет -> Создаем новый
+                # Если файла нет -> Создаем
                 print("-> Файл отсутствует на Диске. Создаем...")
-                file_metadata = {
-                    'name': filename,
-                    'parents': [FOLDER_ID]
-                }
+                file_metadata = {'name': filename, 'parents': [FOLDER_ID]}
                 new_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
                 print(f"-> Успешно создано (ID: {new_file.get('id')}).")
         except Exception as e:
