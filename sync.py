@@ -24,6 +24,14 @@ def sync_raw_urls_to_drive():
     URLS = [
         "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_1.txt",
         "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_2.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_3.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_4.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_5.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_6.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_7.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_8.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_9.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_10.txt",
     ]
 
     # 3. Авторизуемся в Google API от имени вашего пользователя
