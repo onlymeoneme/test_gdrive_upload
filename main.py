@@ -23,8 +23,8 @@ def sync_raw_urls_to_drive():
     # 2. Список ваших прямых ссылок на raw-файлы
     # Вы можете вставить их прямо сюда или считывать из файла/переменной окружения
     URLS = [
-        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/file1.txt",
-        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/file2.json",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_1.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_2.txt",
         # Добавьте сюда остальные ваши ссылки
     ]
 
@@ -33,7 +33,7 @@ def sync_raw_urls_to_drive():
     creds = service_account.Credentials.from_service_account_info(creds_json, scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
-    FOLDER_ID = "ТВОЙ_ID_ПАПКИ"  # Замените на реальный ID папки в Google Drive
+    FOLDER_ID = "1RbHcpoEWUSs8T5QBGSqpOeYjJWJ7"  # Замените на реальный ID папки в Google Drive
 
     # 4. Получаем список файлов из Google Drive, чтобы знать, что обновлять, а что создавать
     print("Запрос списка существующих файлов с Google Drive...")
