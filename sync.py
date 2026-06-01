@@ -33,7 +33,7 @@ def sync_raw_urls_to_drive():
     creds = service_account.Credentials.from_service_account_info(creds_json, scopes=SCOPES)
     drive_service = build('drive', 'v3', credentials=creds)
 
-    FOLDER_ID = "1RbHcpoEWUSs8T5QBGSqpOeYjJWJ7"  # Замените на реальный ID папки в Google Drive
+    FOLDER_ID = "1RbHcpoEWUSs8T5QBGSqpOeYjJWJ7_g1h"  # Замените на реальный ID папки в Google Drive
 
     # 4. Получаем список файлов из Google Drive, чтобы знать, что обновлять, а что создавать
     print("Запрос списка существующих файлов с Google Drive...")
