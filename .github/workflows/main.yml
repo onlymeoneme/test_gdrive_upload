@@ -14,16 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Выкачиваем код вашего репозитория (где лежит Python-скрипт)
+    # 1. Выкачиваем код вашего репозитория
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # 2. Разворачиваем окружение Python
+    # 2. Разворачиваем окружение Python (без принудительного кэша)
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.x'
-        cache: 'pip' # Кэширование зависимостей для ускорения последующих запусков
 
     # 3. Устанавливаем необходимые библиотеки
     - name: Install dependencies
@@ -34,6 +33,5 @@ jobs:
     # 4. Запускаем скрипт синхронизации
     - name: Run sync script
       env:
-        # Пробрасываем секрет из настроек GitHub в переменную окружения скрипта
         GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS }}
-      run: python main.py
+      run: python sync.py
