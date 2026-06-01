@@ -22,8 +22,8 @@ def sync_raw_urls_to_drive():
 
     # 2. Список ваших прямых ссылок на raw-файлы (замените на ваши реальные ссылки)
     URLS = [
-        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/sub_1.txt",
-        "https://raw.githubusercontent.com/автор/репозиторий/main/папка/sub_2.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_1.txt",
+        "https://raw.githubusercontent.com/capitainblack/freetm3/refs/heads/main/configs/sub_2.txt",
     ]
 
     # 3. Авторизуемся в Google API от имени вашего пользователя
